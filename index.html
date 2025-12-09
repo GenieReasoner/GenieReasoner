@@ -50,8 +50,13 @@
 
         /* 2. ENHANCED BOLD TEXT: Global override to make bold text much stronger */
         strong, b, .font-bold {
-            font-weight: 800 !important; /* Extra Bold */
-            color: #000000 !important;   /* Pure Black for contrast */
+            font-weight: 700 !important; /* Extra Bold */
+            color: #1a1a1a; /* Pure Black - Restored without !important to allow overrides */
+        }
+
+        /* Text Shadow for Video Overlays */
+        .text-shadow {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
         }
         
         .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -303,21 +308,12 @@
             );
         };
 
-        // 4. PERFORMANCE FIX: VideoPlayer with IntersectionObserver
-        const VideoPlayer = ({ src, label, children, className, id, activeVideoId, onToggleAudio }) => {
+        // 4. UPDATED: VideoPlayer with Adaptive Size (No Black Bars)
+        const VideoPlayer = ({ src, label, children, className }) => {
             const videoRef = useRef(null);
-            const containerRef = useRef(null); // Ref for the container to observe
-            const [progress, setProgress] = useState(0);
-            const isUnmuted = activeVideoId === id;
-
-            // Manage Mute State
-            useEffect(() => {
-                if (videoRef.current) {
-                    videoRef.current.muted = !isUnmuted;
-                }
-            }, [isUnmuted]);
-
-            // PERFORMANCE: Intersection Observer to play/pause videos
+            const containerRef = useRef(null); 
+            
+            // PERFORMANCE: Intersection Observer to play/pause videos automatically
             useEffect(() => {
                 const video = videoRef.current;
                 const container = containerRef.current;
@@ -328,13 +324,11 @@
                     entries.forEach(entry => {
                         // If video is visible (intersecting)
                         if (entry.isIntersecting) {
-                            // Attempt to play. Handle the Promise to avoid errors if interrupted.
+                            // Try to auto-play (muted)
                             const playPromise = video.play();
                             if (playPromise !== undefined) {
                                 playPromise.catch(error => {
-                                    // Auto-play was prevented. This is common if user hasn't interacted with page yet.
-                                    // Usually fine since we start muted.
-                                    console.log("Auto-play prevented (normal behavior until interaction):", error);
+                                    // Auto-play prevented
                                 });
                             }
                         } else {
@@ -353,77 +347,33 @@
                 };
             }, []);
 
-            const handleToggle = (e) => {
-                e.stopPropagation(); 
-                onToggleAudio(id);
-            };
-
-            const handleTimeUpdate = () => {
-                if (videoRef.current) {
-                    const duration = videoRef.current.duration;
-                    const currentTime = videoRef.current.currentTime;
-                    if (duration > 0) {
-                        setProgress((currentTime / duration) * 100);
-                    }
-                }
-            };
-
-            const handleSeek = (e) => {
-                e.stopPropagation();
-                if (videoRef.current) {
-                    const newTime = (e.target.value / 100) * videoRef.current.duration;
-                    videoRef.current.currentTime = newTime;
-                    setProgress(e.target.value);
-                }
-            };
-
             return (
                 <div 
                     ref={containerRef} // Observe this container
-                    className={`relative w-full h-full group bg-black cursor-pointer overflow-hidden ${className}`} 
-                    onClick={handleToggle}
+                    className={`relative w-full h-full group bg-black overflow-hidden ${className}`} 
                 >
                     <video 
                         ref={videoRef}
-                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                        muted={!isUnmuted}
+                        className="w-full h-full object-cover bg-gray-900" 
+                        muted
                         loop 
                         playsInline
-                        preload="metadata" // Don't download entire video immediately
-                        // REMOVED: autoPlay (Handled by IntersectionObserver now)
+                        controls  // Native Controls
+                        preload="metadata"
                         src={src}
-                        onTimeUpdate={handleTimeUpdate}
                     />
                     
+                    {/* Optional Label in Top-Left (Non-intrusive) */}
                     {label && (
-                        <div className="absolute top-2 left-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold uppercase rounded backdrop-blur-sm border border-white/10 pointer-events-none z-10">
+                        <div className="absolute top-2 left-2 px-2 py-1 bg-black/60 text-white text-[10px] font-bold uppercase rounded backdrop-blur-sm border border-white/10 pointer-events-none z-10 text-shadow">
                             {label}
                         </div>
                     )}
 
-                    <div className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full text-white backdrop-blur-sm transition-all duration-300 z-10 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 shadow-lg border border-white/10">
-                        {isUnmuted ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                    {/* Description Overlay - retained but ensure it doesn't block controls */}
+                    <div className="pointer-events-none z-10">
+                        {children}
                     </div>
-
-                    <div 
-                        className="absolute bottom-0 left-0 w-full h-1.5 bg-gray-700/50 z-30 transition-all duration-200 group-hover:h-2"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div 
-                            className="absolute top-0 left-0 h-full bg-blue-500 rounded-r-sm pointer-events-none" 
-                            style={{ width: `${progress}%` }} 
-                        />
-                        <input 
-                            type="range" 
-                            min="0" 
-                            max="100" 
-                            step="0.1"
-                            value={progress}
-                            onChange={handleSeek}
-                            className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                    </div>
-                    {children}
                 </div>
             );
         };
@@ -483,8 +433,8 @@
                 if (window.lucide) window.lucide.createIcons();
             });
 
-            // Global Audio State
-            const [activeVideoId, setActiveVideoId] = useState(null);
+            // Removed Global Audio State since we use native controls now
+            // const [activeVideoId, setActiveVideoId] = useState(null);
             
             // 1. SCROLL REFS: Store refs to scroll containers
             const scrollRefs = useRef({});
@@ -505,11 +455,46 @@
                 }
             }, []);
 
-            const handleToggleAudio = (id) => {
-                setActiveVideoId(prevId => prevId === id ? null : id);
-            };
+            // const handleToggleAudio = (id) => {
+            //     setActiveVideoId(prevId => prevId === id ? null : id);
+            // };
 
             const totalSubtaskSamples = SUBTASK_DATA.reduce((acc, curr) => acc + curr.val, 0);
+
+            // UPDATED: Table Data from LaTeX
+            const tableData = [
+                {
+                    name: "Qwen2.5-VL-3B",
+                    vals: [78.49, 37.53, 60.08, 52.61, 65.50, 52.75, 55.67, 46.43, 57.62, 25.98, 86.22, 78.85, 34.43, 73.28, 59.05],
+                    avg: 58.64
+                },
+                {
+                    name: "Qwen2.5-VL-7B",
+                    vals: [86.66, 50.56, 75.93, 73.09, 76.83, 62.62, 60.67, 54.46, 60.40, 24.20, 73.78, 77.53, 50.30, 72.41, 64.76],
+                    avg: 66.69
+                },
+                {
+                    name: "Robo-brain2",
+                    vals: [85.73, 57.53, 78.40, 71.08, 82.33, 56.88, 61.00, 51.79, 58.22, 24.56, 84.89, 83.26, 50.90, 76.72, 57.14],
+                    avg: 67.38
+                },
+                {
+                    name: "GPT-o4-mini",
+                    vals: [88.00, 93.48, 90.12, 73.90, 84.67, 71.63, 65.17, 71.43, 68.91, 49.82, 89.78, 79.74, 66.77, 77.59, 68.57],
+                    avg: 77.61
+                },
+                {
+                    name: "Gemini-2.5-pro",
+                    vals: [88.42, 89.89, 89.71, 70.68, 89.83, 67.37, 76.67, 81.25, 75.05, 62.28, 91.11, 87.67, 67.07, 90.52, 87.62],
+                    avg: 80.55
+                },
+                {
+                    name: "Ours-3B",
+                    vals: [84.18, 68.54, 93.21, 77.51, 96.67, 85.25, 90.50, 55.36, 73.86, 51.60, 96.44, 83.26, 75.45, 93.10, 85.71],
+                    avg: 82.72,
+                    highlight: true
+                }
+            ];
 
             return (
                 <div className="bg-white min-h-screen">
@@ -571,21 +556,17 @@
                                                         <div className="relative border-b border-white/10 overflow-hidden">
                                                             <VideoPlayer 
                                                                 src={item.src} 
-                                                                id={`${baseId}-3rd`}
-                                                                activeVideoId={activeVideoId}
-                                                                onToggleAudio={handleToggleAudio}
+                                                                label="3rd Person"
                                                             />
                                                         </div>
                                                         <div className="relative overflow-hidden">
                                                             <VideoPlayer 
                                                                 src={item.src_fpv || item.src} 
-                                                                id={`${baseId}-1st`}
-                                                                activeVideoId={activeVideoId}
-                                                                onToggleAudio={handleToggleAudio}
+                                                                label="1st Person"
                                                             >
-                                                                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent pointer-events-none">
-                                                                    <h5 className="text-white text-sm font-bold sans-font text-shadow leading-tight mb-1">{item.title}</h5>
-                                                                    <p className="text-gray-200 text-[11px] leading-snug opacity-90">{item.desc}</p>
+                                                                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none flex flex-col items-center justify-end text-center">
+                                                                    <h5 className="!text-white text-sm font-bold sans-font text-shadow leading-tight mb-1">{item.title}</h5>
+                                                                    <p className="!text-white text-[11px] leading-snug opacity-100 text-shadow">{item.desc}</p>
                                                                 </div>
                                                             </VideoPlayer>
                                                         </div>
@@ -598,13 +579,10 @@
                                                 <div className="group relative aspect-video bg-black rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                                     <VideoPlayer 
                                                         src={item.src}
-                                                        id={baseId}
-                                                        activeVideoId={activeVideoId}
-                                                        onToggleAudio={handleToggleAudio}
                                                     >
-                                                        <div className="absolute bottom-0 left-0 right-0 p-4 video-card-title pointer-events-none">
-                                                            <h5 className="text-white text-sm font-bold sans-font text-shadow leading-tight">{item.title}</h5>
-                                                            <p className="text-gray-300 text-xs mt-1">{item.desc}</p>
+                                                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none flex flex-col items-center justify-end text-center">
+                                                            <h5 className="!text-white text-sm font-bold sans-font text-shadow leading-tight">{item.title}</h5>
+                                                            <p className="!text-white text-xs mt-1 text-shadow opacity-90">{item.desc}</p>
                                                         </div>
                                                     </VideoPlayer>
                                                 </div>
@@ -818,7 +796,7 @@
                                 <table className="academic-table min-w-[1000px]">
                                     <thead><tr><th className="sticky left-0 bg-gray-50 z-10 text-left pl-4">Model</th><th>Scene</th><th>Dual</th><th>Task</th><th>Rel.Pos</th><th>Action</th><th>Success</th><th>Subtask</th><th>Reason</th><th>Traj</th><th>Progress</th><th>Intention</th><th>Interact</th><th>Mistake</th><th>Classify</th><th>Recover</th><th className="sticky right-0 bg-blue-50 text-blue-700 z-10 border-l border-blue-100">Avg</th></tr></thead>
                                     <tbody>
-                                        {[{name: "Qwen2.5-VL-7B", vals: [86.7, 50.6, 75.9, 73.1, 76.8, 62.6, 60.7, 54.5, 60.4, 24.2, 73.8, 77.5, 50.3, 72.4, 64.8], avg: 66.69}, {name: "Robo-brain2", vals: [85.7, 57.5, 78.4, 71.1, 82.3, 56.9, 61.0, 51.8, 58.2, 24.6, 84.9, 83.3, 50.9, 76.7, 57.1], avg: 67.38}, {name: "GPT-4o-mini", vals: [88.0, 93.5, 90.1, 73.9, 84.7, 71.6, 65.2, 71.4, 68.9, 49.8, 89.8, 79.7, 66.8, 77.6, 68.6], avg: 77.61}, {name: "Gemini-1.5-pro", vals: [88.4, 89.9, 89.7, 70.7, 89.8, 67.4, 76.7, 81.3, 75.1, 62.3, 91.1, 87.7, 67.1, 90.5, 87.6], avg: 80.55}, {name: "UniFACT (Ours)", vals: [84.2, 68.5, 93.2, 77.5, 96.7, 85.3, 90.5, 55.4, 73.9, 51.6, 96.4, 83.3, 75.5, 93.1, 85.7], avg: 82.72, highlight: true}].map((row, i) => (
+                                        {tableData.map((row, i) => (
                                             <tr key={i} className={row.highlight ? "highlight-row" : "hover:bg-gray-50"}><td className={`row-title sticky left-0 z-10 ${row.highlight ? 'bg-blue-50' : 'bg-white'}`}>{row.name}</td>{row.vals.map((v, j) => <td key={j}>{v}</td>)}<td className={`sticky right-0 z-10 font-bold border-l border-blue-100 ${row.highlight ? 'highlight-cell bg-blue-100' : 'bg-blue-50'}`}>{row.avg}</td></tr>
                                         ))}
                                     </tbody>
