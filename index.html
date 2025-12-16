@@ -229,14 +229,15 @@
         const DEMO_CATEGORIES = [ 
             { id: 'reasoning', label: 'Embodied Reasoning' }, 
             { id: 'generalization', label: 'Robust Generalization' }, 
-            { id: 'instruction', label: 'Instruction Following' }, 
             { id: 'hri', label: 'Human-Robot Interaction' } 
         ];
         
         const DEMO_ITEMS = {
             reasoning: [ 
-                { title: "Inner Object Grasping", desc: "Occlusion reasoning", src: "./videos/reasoning_inner.mp4" }, 
-                { title: "Shelf Organizing", desc: "Reset misplaced items", src: "./videos/reasoning_error.mp4" } 
+                { title: "Logic Reasoning", desc: "Identifies the target is blocked and plans a \"remove-then-retrieve\" action sequence.", src: "./videos/reasoning_inner.mp4" }, 
+                { title: "Open-Set Shelf Resetting", desc: "Continuously identifies and restores misplaced items, generalizing to arbitrary SKUs.", src: "./videos/reasoning_error.mp4" },
+                { title: "Semantic Following", desc: "Precise semantic alignment for both single-step actions and full task execution.", src: "./videos/instr_cake.mp4" }, 
+                { title: "Spatial Understanding", desc: "Reasoning over geometric relationships to place objects in distinct relative orientations.", src: "./videos/spatial_blocks.mp4" } 
             ],
             generalization: [ 
                 { title: "Water Bottle", desc: "UserPrompt: I'm thirsty, but I'm trying to lose weight. Please give me a suitable drink.", src: "./videos/gen_water.mp4", src_fpv: "./videos/gen_water_fpv.mp4" }, 
@@ -244,10 +245,6 @@
                 { title: "White Wadded Paper", desc: "UserPrompt: Pick up desktop trash.", src: "./videos/gen_paper.mp4", src_fpv: "./videos/gen_paper_fpv.mp4" }, 
                 { title: "Remote Control", desc: "UserPrompt: I want to watch TV and switch channels. Please provide me the corresponding items.", src: "./videos/gen_remote.mp4", src_fpv: "./videos/gen_remote_fpv.mp4" }, 
                 { title: "Charging Cable", desc: "UserPrompt: My phone is out of battery, please give me the corresponding item.", src: "./videos/gen_cable.mp4", src_fpv: "./videos/gen_cable_fpv.mp4" } 
-            ],
-            instruction: [ 
-                { title: "Semantic Understanding", desc: "Step-by-step control enabling precise following of cake details and layer placement.", src: "./videos/instr_cake.mp4" }, 
-                { title: "Spatial Understanding", desc: "Precise understanding and targeting of different blocks in various spatial orientations.", src: "./videos/spatial_blocks.mp4" } 
             ],
             hri: [ 
                 { title: "Adversarial", desc: "Dynamic Following", src: "./videos/hri_adversarial.mp4" }, 
@@ -292,7 +289,6 @@
                                 <a href="#demos" className="nav-link">Demos</a>
                                 <a href="#benchmark" className="nav-link">Benchmark</a>
                                 <a href="#methodology" className="nav-link">Methodology</a>
-                                <a href="#experiments" className="nav-link">Results</a>
                             </div>
                             
                             <a 
@@ -461,41 +457,6 @@
 
             const totalSubtaskSamples = SUBTASK_DATA.reduce((acc, curr) => acc + curr.val, 0);
 
-            // UPDATED: Table Data from LaTeX
-            const tableData = [
-                {
-                    name: "Qwen2.5-VL-3B",
-                    vals: [78.49, 37.53, 60.08, 52.61, 65.50, 52.75, 55.67, 46.43, 57.62, 25.98, 86.22, 78.85, 34.43, 73.28, 59.05],
-                    avg: 58.64
-                },
-                {
-                    name: "Qwen2.5-VL-7B",
-                    vals: [86.66, 50.56, 75.93, 73.09, 76.83, 62.62, 60.67, 54.46, 60.40, 24.20, 73.78, 77.53, 50.30, 72.41, 64.76],
-                    avg: 66.69
-                },
-                {
-                    name: "Robo-brain2",
-                    vals: [85.73, 57.53, 78.40, 71.08, 82.33, 56.88, 61.00, 51.79, 58.22, 24.56, 84.89, 83.26, 50.90, 76.72, 57.14],
-                    avg: 67.38
-                },
-                {
-                    name: "GPT-o4-mini",
-                    vals: [88.00, 93.48, 90.12, 73.90, 84.67, 71.63, 65.17, 71.43, 68.91, 49.82, 89.78, 79.74, 66.77, 77.59, 68.57],
-                    avg: 77.61
-                },
-                {
-                    name: "Gemini-2.5-pro",
-                    vals: [88.42, 89.89, 89.71, 70.68, 89.83, 67.37, 76.67, 81.25, 75.05, 62.28, 91.11, 87.67, 67.07, 90.52, 87.62],
-                    avg: 80.55
-                },
-                {
-                    name: "Ours-3B",
-                    vals: [84.18, 68.54, 93.21, 77.51, 96.67, 85.25, 90.50, 55.36, 73.86, 51.60, 96.44, 83.26, 75.45, 93.10, 85.71],
-                    avg: 82.72,
-                    highlight: true
-                }
-            ];
-
             return (
                 <div className="bg-white min-h-screen">
                     {/* 3. Added Navigation Bar */}
@@ -528,17 +489,13 @@
                         </div>
                     </header>
 
-                    <div className="max-w-5xl mx-auto px-6 mb-12 mt-12">
-                        <div className="relative bg-white rounded-lg overflow-hidden shadow-xl border border-gray-200 group">
-                             <SmartImage src="./figs/fig1_vis.png" alt="Main Teaser Figure" className="w-full h-auto" fallbackText="[Figure 1: Visualization]" />
-                        </div>
-                    </div>
 
                     {/* Videos */}
                     <section id="demos" className="max-w-7xl mx-auto px-6 mb-20 scroll-mt-20">
                         {DEMO_CATEGORIES.map(cat => (
                             <div key={cat.id} className="mb-12">
-                                <h4 className="sans-font font-bold text-sm md:text-base uppercase text-gray-500 tracking-wider mb-6 border-b border-gray-100 pb-2 text-center">
+                                {/* Removed border-b and pb-2 here as requested */}
+                                <h4 className="sans-font font-bold text-sm md:text-base uppercase text-gray-500 tracking-wider mb-6 text-center">
                                     {cat.label}
                                 </h4>
                                 <div 
@@ -591,6 +548,16 @@
                             </div>
                         ))}
                     </section>
+
+                    <div className="max-w-5xl mx-auto px-6 mb-12 mt-12">
+                        <div className="relative bg-white rounded-lg overflow-hidden shadow-xl border border-gray-200 group mb-8">
+                             <SmartImage src="./figs/fig1_vis.png" alt="Main Teaser Figure" className="w-full h-auto" fallbackText="[Figure 1: Visualization]" />
+                        </div>
+                        {/* Summary & Transition Text */}
+                        <div className="text-base md:text-textMain text-gray-600 text-center leading-relaxed sans-font max-w-4xl mx-auto font-light">
+                            We present <strong className="text-textMain">UniFACT-VLA</strong>, a unified system that seamlessly bridges high-level reasoning and low-level control via a novel flow-matching action tokenizer. This design eliminates the modality gap, achieving breakthrough performance on our <strong className="text-textMain">AER Benchmark</strong> while ensuring superior generalization in real-world tasks.
+                        </div>
+                    </div>
 
                     <div className="section-divider max-w-5xl mx-auto"></div>
 
@@ -697,16 +664,16 @@
                             
                             <div className="max-w-4xl mx-auto text-justify text-gray-600 space-y-6">
                                 <p>
-                                    Possessing a VLM with robust embodied reasoning is only half the equation; seamlessly translating this reasoning into high-precision control without losing generalizability presents a distinct hurdle.
+                                    Achieving robust embodied reasoning is only the first step; the critical challenge lies in translating it into precise control without compromising generalizability.
                                 </p>
                                 <p>
-                                    Current VLA systems often suffer from a "split brain" problem. They attach continuous diffusion heads to discrete VLMs, creating <strong>gradient interference</strong> that damages the model's reasoning capabilities during training.
+                                    Current VLA systems often suffer from knowledge insulation. They attach continuous diffusion heads to discrete VLMs, creating <strong>gradient interference</strong> that damages the model's reasoning capabilities during training.
                                 </p>
                                 <p>
-                                    We introduce <strong>UniFACT-VLA</strong>, a unified architecture that treats physical action not as a separate regression task, but as a "foreign language" for the VLM.
+                                    We introduce <strong>UniFACT-VLA</strong>, a unified architecture that treats physical action not as a separate regression task, but as a discrete "foreign language" aligned with the VLM.
                                 </p>
                                 <p>
-                                    By discretizing robot actions into tokens, we align the action space with the reasoning space. This enables the model to be optimized with a single auto-regressive objective—allowing high-level <strong>Embodied Reasoning</strong> to flow seamlessly into low-level control without conflict.
+                                    By tokenizing robot actions, we unify the action and reasoning spaces. This enables the model to be optimized with a single auto-regressive objective—allowing high-level <strong>Embodied Reasoning</strong> to flow seamlessly into low-level control without conflict.
                                 </p>
                             </div>
                         </div>
@@ -769,167 +736,6 @@
                                 </div>
                             </div>
                         </div>
-                    </section>
-
-                    <div className="section-divider max-w-5xl mx-auto"></div>
-
-                    {/* Experimental Results */}
-                    <section id="experiments" className="max-w-6xl mx-auto px-6 mb-24 scroll-mt-20">
-                        <SectionHeader title="Experiment Results" />
-
-                        {/* Step 1: The Brain */}
-                        <div className="mb-24 scroll-mt-24" id="exp-brain">
-                            <div className="flex items-center justify-center gap-4 mb-6">
-                                <span className="step-badge">1</span>
-                                <h3 className="sans-font text-2xl font-bold text-textMain flex items-center gap-2">
-                                    High-Level: SOTA Embodied Reasoning
-                                </h3>
-                            </div>
-                            <div className="mb-8 max-w-4xl mx-auto text-justify">
-                                <p className="text-gray-600 mb-6">
-                                    We first evaluate the reasoning ability of our pretrained model. On the AER benchmark, UniFACT-ER significantly outperforms baselines including close-sourced Gemini and GPT.
-                                </p>
-                            </div>
-                            <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
-                                <table className="academic-table min-w-[1000px]">
-                                    <thead><tr><th className="sticky left-0 bg-gray-50 z-10 text-left pl-4">Model</th><th>Scene</th><th>Dual</th><th>Task</th><th>Rel.Pos</th><th>Action</th><th>Success</th><th>Subtask</th><th>Reason</th><th>Traj</th><th>Progress</th><th>Intention</th><th>Interact</th><th>Mistake</th><th>Classify</th><th>Recover</th><th className="sticky right-0 bg-blue-50 text-blue-700 z-10 border-l border-blue-100">Avg</th></tr></thead>
-                                    <tbody>
-                                        {tableData.map((row, i) => (
-                                            <tr key={i} className={row.highlight ? "highlight-row" : "hover:bg-gray-50"}><td className={`row-title sticky left-0 z-10 ${row.highlight ? 'bg-blue-50' : 'bg-white'}`}>{row.name}</td>{row.vals.map((v, j) => <td key={j}>{v}</td>)}<td className={`sticky right-0 z-10 font-bold border-l border-blue-100 ${row.highlight ? 'highlight-cell bg-blue-100' : 'bg-blue-50'}`}>{row.avg}</td></tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/* Step 2: Correlation (Updated Table) */}
-                        <div className="mb-24 scroll-mt-24" id="exp-corr">
-                            <div className="flex items-center justify-center gap-4 mb-6">
-                                <span className="step-badge">2</span>
-                                <h3 className="sans-font text-2xl font-bold text-textMain flex items-center gap-2">
-                                    The Correlation: Smarter Reasoning = Better Action?
-                                </h3>
-                            </div>
-                            
-                            <div className="mb-8 max-w-4xl mx-auto text-justify">
-                                <p className="text-gray-600 mb-6">
-                                    We conducted a controlled ablation study to verify if stronger reasoning translates to better execution. The results show a clear <strong>positive correlation</strong>: improving the VLM's AER score (Reasoning) directly drives End-to-End Success Rate (Action).
-                                </p>
-                            </div>
-                            
-                            <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
-                                <table className="academic-table w-full text-xs md:text-sm">
-                                    <thead>
-                                        <tr>
-                                            <th className="bg-gray-50" rowSpan="2">Exp#</th>
-                                            <th className="bg-gray-50" rowSpan="2">Base</th>
-                                            <th className="bg-gray-100" colSpan="2">Pre-train</th>
-                                            <th className="bg-gray-50" rowSpan="2">Post-train</th>
-                                            <th className="bg-gray-50" rowSpan="2">AER</th>
-                                            <th className="bg-blue-50 text-blue-700" colSpan="3">Language Following ↑</th>
-                                            <th className="bg-green-50 text-green-700" colSpan="3">Success Rate ↑</th>
-                                        </tr>
-                                        <tr className="border-b-2 border-gray-800">
-                                            <th className="bg-gray-100 border-b-2 border-gray-300">Stage1</th>
-                                            <th className="bg-gray-100 border-b-2 border-gray-300">Stage2</th>
-                                            <th className="bg-blue-50 border-b-2 border-blue-200">Target</th>
-                                            <th className="bg-blue-50 border-b-2 border-blue-200">Abs Pose</th>
-                                            <th className="bg-blue-50 border-b-2 border-blue-200">Color</th>
-                                            <th className="bg-green-50 border-b-2 border-green-200">Target</th>
-                                            <th className="bg-green-50 border-b-2 border-green-200">Abs Pose</th>
-                                            <th className="bg-green-50 border-b-2 border-green-200">Color</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr className="hover:bg-gray-50">
-                                            <td className="font-semibold text-gray-800">Exp1</td>
-                                            <td>Qwen</td>
-                                            <td className="text-center"><span className="x-mark">✗</span></td>
-                                            <td className="text-center"><span className="x-mark">✗</span></td>
-                                            <td>Action Only</td>
-                                            <td className="text-center">58.64</td>
-                                            <td className="text-center">0.24</td>
-                                            <td className="text-center">0.05</td>
-                                            <td className="text-center">0.17</td>
-                                            <td className="text-center">0.05</td>
-                                            <td className="text-center">0.00</td>
-                                            <td className="text-center">0.06</td>
-                                        </tr>
-                                        <tr className="hover:bg-gray-50 border-t border-gray-100">
-                                            <td className="font-semibold text-gray-800">Exp2</td>
-                                            <td>Qwen</td>
-                                            <td className="text-center"><span className="x-mark">✗</span></td>
-                                            <td className="text-center font-medium">Action</td>
-                                            <td>Action Only</td>
-                                            <td className="text-center">58.64</td>
-                                            <td className="text-center">0.57</td>
-                                            <td className="text-center">0.45</td>
-                                            <td className="text-center">0.52</td>
-                                            <td className="text-center">0.12</td>
-                                            <td className="text-center">0.20</td>
-                                            <td className="text-center">0.07</td>
-                                        </tr>
-                                        <tr className="hover:bg-gray-50 border-t border-gray-100">
-                                            <td className="font-semibold text-gray-800">Exp3</td>
-                                            <td>Qwen</td>
-                                            <td className="text-center font-medium">Embodied Data</td>
-                                            <td className="text-center font-medium">Action</td>
-                                            <td>Action Only</td>
-                                            <td className="text-center font-bold text-blue-700">82.72</td>
-                                            <td className="text-center">0.78</td>
-                                            <td className="text-center font-bold text-blue-600">0.68</td>
-                                            <td className="text-center">0.73</td>
-                                            <td className="text-center">0.18</td>
-                                            <td className="text-center">0.05</td>
-                                            <td className="text-center">0.14</td>
-                                        </tr>
-                                        <tr className="highlight-row border-t-2 border-blue-200 font-medium">
-                                            <td className="font-bold text-blue-900">Exp4</td>
-                                            <td>Qwen</td>
-                                            <td className="text-center">Embodied Data</td>
-                                            <td className="text-center">Action</td>
-                                            <td className="text-blue-800">Embodied Cotrain</td>
-                                            <td className="text-center font-bold text-blue-700">82.72</td>
-                                            <td className="text-center font-bold text-blue-600">0.79</td>
-                                            <td className="text-center">0.54</td>
-                                            <td className="text-center font-bold text-blue-600">0.91</td>
-                                            <td className="text-center font-bold text-green-600">0.25</td>
-                                            <td className="text-center font-bold text-green-600">0.35</td>
-                                            <td className="text-center font-bold text-green-600">0.22</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/* Step 3: The Cerebellum (Tokenizer) */}
-                        <div className="mb-24 scroll-mt-24" id="exp-action">
-                            <div className="flex items-center justify-center gap-4 mb-6">
-                                <span className="step-badge">3</span>
-                                <h3 className="sans-font text-2xl font-bold text-textMain flex items-center gap-2">
-                                    Low-Level: Discrete token + Continuous reconstruction
-                                </h3>
-                            </div>
-                            <p className="text-gray-600 mb-8 max-w-4xl mx-auto text-justify">
-                                We compare our UniFACT-VLA against state-of-the-art <strong>Discrete VLA (FAST+)</strong> and <strong>Continuous VLA (<span className="font-serif italic">π</span><sub>0</sub>, <span className="font-serif italic">π</span><sub>0.5</sub>)</strong> policies in real-world experiments. UniFACT-VLA achieves the SOTA in both high instruction following accuracy (than discrete methods) and high success rates on unseen objects (than continuous methods).
-                            </p>
-                            
-                            <div className="grid md:grid-cols-3 gap-6">
-                                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                                    <h5 className="sans-font text-xs font-bold uppercase text-gray-500 mb-4 text-center">Instruction Following</h5>
-                                    <SmartImage src="./figs/fig7_language_following.png" alt="Fig 7: Language Following" className="w-full h-auto rounded" fallbackText="[Fig 7: Language Following Chart]" />
-                                </div>
-                                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                                    <h5 className="sans-font text-xs font-bold uppercase text-gray-500 mb-4 text-center">Success Rate</h5>
-                                    <SmartImage src="./figs/fig8_success_rate.png" alt="Fig 8: Success Rate" className="w-full h-auto rounded" fallbackText="[Fig 8: Success Rate Chart]" />
-                                </div>
-                                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                                    <h5 className="sans-font text-xs font-bold uppercase text-gray-500 mb-4 text-center">Overall Score</h5>
-                                    <SmartImage src="./figs/fig9_overall_score.png" alt="Fig 9: Overall Score" className="w-full h-auto rounded" fallbackText="[Fig 9: Overall Performance]" />
-                                </div>
-                            </div>
-                        </div>
-
                     </section>
 
                     {/* Footer */}
