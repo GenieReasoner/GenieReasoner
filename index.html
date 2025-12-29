@@ -154,7 +154,7 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        /* Bar Chart Styles - Removed as chart is replaced by image, but keeping CSS to minimize changes if other parts rely on it (though likely safe to remove, keeping strictly minimal changes means leaving unused CSS is okay) */
+        /* Bar Chart Styles */
         .bar-container {
             display: flex;
             flex-direction: column;
@@ -239,6 +239,7 @@
         const Bot = (props) => <IconWrapper name="bot" {...props} />;
         const ChevronLeft = (props) => <IconWrapper name="chevron-left" {...props} />;
         const ChevronRight = (props) => <IconWrapper name="chevron-right" {...props} />;
+        const Mail = (props) => <IconWrapper name="mail" {...props} />;
 
         // Improved WeChat Icon (Standard Style)
         const WeChatIcon = ({ size = 20, className }) => (
@@ -277,10 +278,8 @@
             { name: "Task Progress", val: 281, cat: "planning" },
             { name: "Relative Pos. Grounding", val: 249, cat: "perception" },
             { name: "Human-Robot Interaction", val: 227, cat: "collab" },
-            // MODIFICATION: Value 225 -> 215 (Match Paper)
             { name: "Human Intention", val: 215, cat: "collab" }, 
             { name: "Mistake Classify", val: 116, cat: "mistake" },
-            // MODIFICATION: "Reasoning" -> "Fine-grained Planning" (Match Paper)
             { name: "Fine-grained Planning", val: 112, cat: "planning" }, 
             { name: "Mistake Recovery", val: 105, cat: "mistake" },
         ];
@@ -308,8 +307,9 @@
                 { title: "Charging Cable", desc: "UserPrompt: My phone is out of battery, please give me the corresponding item.", src: "./videos/gen_cable.mp4", src_fpv: "./videos/gen_cable_fpv.mp4" } 
             ],
             hri: [ 
+                { title: "Cooperation", desc: "Human Intention Understanding & Action Interaction", src: "./videos/hri_cooperation.mp4" },
                 { title: "Adversarial", desc: "Dynamic Following", src: "./videos/hri_adversarial.mp4" }, 
-                { title: "Cooperation", desc: "Human Intention Understanding & Action Interaction", src: "./videos/hri_coop.mp4" } 
+                { title: "Interaction", desc: "Human Intention Understanding & Action Interaction", src: "./videos/hri_coop.mp4" } 
             ]
         };
 
@@ -539,17 +539,46 @@
                     <Navigation />
                     
                     {/* Header */}
-                    <header className="pt-10 pb-16 px-6 max-w-5xl mx-auto text-center border-b border-gray-100">
+                    <header className="pt-10 pb-16 px-6 max-w-6xl mx-auto text-center border-b border-gray-100">
                         <h1 className="sans-font text-4xl md:text-6xl font-bold text-textMain mb-6 tracking-tighter leading-[1.1]">
                             GenieReasoner & ERIQ
                         </h1>
-                        <h2 className="sans-font text-xl md:text-3xl text-textMuted font-light mb-4 max-w-5xl mx-auto leading-normal">
+                        <h2 className="sans-font text-xl md:text-3xl text-black font-bold mb-12 max-w-5xl mx-auto leading-tight">
                             Unified Embodied VLM Reasoning with Robotic Action via Autoregressive Discretized Pre-training
                         </h2>
                         
-                        <div className="sans-font mb-10">
-                            <div className="font-medium text-lg text-textMain">AgiBot Team</div>
-                            <div className="text-textMuted text-sm mt-1">AgiBot Research</div>
+                        {/* Authors Section */}
+                        <div className="sans-font mb-10 max-w-5xl mx-auto">
+                            {/* Author List */}
+                            <div className="text-base md:text-lg text-black font-bold leading-normal mb-2">
+                                <span className="font-bold whitespace-nowrap">Yi Liu<sup>1*</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Sukai Wang<sup>1*<span className="text-xl inline-block -translate-y-0.5">†</span></sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Dafeng Wei<sup>1</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Wei Zhang<sup>1</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Linqing Zhong<sup>1</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Jiange Yang<sup>1</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Guanghui Ren<sup>2</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Jinyu Zhang<sup>1 3</sup></span>,<br className="hidden lg:block"/>
+                                <span className="font-bold whitespace-nowrap">Maoqing Yao<sup>2</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Chuankang Li<sup>1</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Xindong He<sup>1</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Liliang Chen<sup>1</sup></span>,{' '}
+                                <span className="font-bold whitespace-nowrap">Jianlan Luo<sup>1 3 ◆</sup></span>
+                            </div>
+
+                            {/* Affiliations */}
+                            <div className="text-black text-sm font-bold space-y-1 md:space-y-0 md:space-x-8 flex flex-col md:flex-row justify-center items-center mb-2">
+                                <span><sup>1</sup> AgiBot Research</span>
+                                <span><sup>2</sup> AgiBot</span>
+                                <span><sup>3</sup> Shanghai Innovation Institute</span>
+                            </div>
+
+                            {/* Footnotes */}
+                            <div className="text-black text-xs font-bold flex flex-wrap justify-center gap-x-6 gap-y-2 italic">
+                                <span>* Equal Contribution</span>
+                                <span><span className="text-sm">†</span> Project Leader</span>
+                                <span>◆ Corresponding Author</span>
+                            </div>
                         </div>
 
                         <div className="flex justify-center gap-4 flex-wrap mt-8">
@@ -616,8 +645,8 @@
                         <div className="relative bg-white rounded-lg overflow-hidden shadow-xl border border-gray-200 group mb-8">
                              <SmartImage src="./figs/fig1_vis.png" alt="Main Teaser Figure" className="w-full h-auto" fallbackText="[Figure 1: Visualization]" />
                         </div>
-                        <div className="text-base md:text-textMain text-gray-600 text-center leading-relaxed sans-font max-w-7xl mx-auto font-light">
-                            While general-purpose robots require both broad semantic reasoning and high-precision execution, existing Vision-Language-Action (VLA) models often struggle with the trade-off between these two critical capabilities. To address this, we present <strong>GenieReasoner</strong>, a unified framework that co-optimizes high-level embodied intelligence and low-level control within a single autoregressive transformer. Our work first establishes <strong>ERIQ</strong>, a comprehensive benchmark designed to quantify the reasoning bottleneck in robotic manipulation. To bridge the gap from reasoning to precise action, we introduce <strong>FACT</strong>, a novel flow-matching-based action tokenizer that preserves high-fidelity trajectories in a discrete space. This unified design allows <strong>GenieReasoner</strong> to significantly outperform both diffusion-based and discrete-action baselines across simulated and real-world tasks.                        
+                        <div className="text-base md:text-textMain text-gray-600 text-justify leading-relaxed sans-font max-w-7xl mx-auto font-light">
+                            While general-purpose robots require both broad semantic reasoning and high-precision execution, existing Vision-Language-Action (VLA) models often struggle with the trade-off between these two critical capabilities. To address this, we present <strong>GenieReasoner</strong>, a unified framework that co-optimizes high-level embodied intelligence and low-level control within a single autoregressive transformer. Our work first establishes <strong>ERIQ</strong>, a comprehensive benchmark designed to quantify the reasoning bottleneck in robotic manipulation. To bridge the gap from reasoning to precise action, we introduce <strong>FACT</strong>, a novel flow-based action tokenizer that preserves high-fidelity trajectories in a discrete space. This unified design allows <strong>GenieReasoner</strong> to significantly outperform both diffusion-based and discrete-action baselines across simulated and real-world tasks.                        
                         </div>
                     </div>
 
@@ -679,7 +708,6 @@
                                 </div>
                             </div>
                             
-                            {/* Modified: Why it works better section with new side-by-side layout */}
                             <div className="mt-12">
                                 <h4 className="sans-font font-bold text-xl mb-8 text-textMain text-center">Why it works better?</h4>
                                 
@@ -833,6 +861,13 @@
                             </div>
                         </div>
                     </section>
+
+                    {/* Closing Statement Section */}
+                    <div className="max-w-4xl mx-auto px-6 mb-20">
+                        <p className="text-gray-600 leading-relaxed italic text-justify text-sm">
+                            We have fully open-sourced the <strong>ERIQ Benchmark</strong>, aiming to provide a reproducible and measurable technical foundation for the embodied AI community. We sincerely invite developers and researchers to leverage this benchmark, share feedback on edge cases in real-world scenarios, and collaborate to refine the metrics for embodied reasoning—accelerating the emergence of general-purpose embodied intelligence!
+                        </p>
+                    </div>
 
                     <footer className="bg-bgLight border-t border-gray-200 py-20 px-6">
                         <div className="max-w-5xl mx-auto">
