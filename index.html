@@ -538,11 +538,14 @@
 
             const totalSubtaskSamples = SUBTASK_DATA.reduce((acc, curr) => acc + curr.val, 0);
 
-            const bibtex = `@article{liu2025geniereasoner,
-  title={Unified Embodied VLM Reasoning with Robotic Action via Autoregressive Discretized Pre-training},
-  author={Liu, Yi and Wang, Sukai and Wei, Dafeng and Cai, Xiaowei and Zhong, Linqing and Yang, Jiange and Ren, Guanghui and Zhang, Jinyu and Yao, Maoqing and Li, Chuankang and He, Xindong and Chen, Liliang and Luo, Jianlan},
-  journal={arXiv preprint arXiv:submit/7120983},
-  year={2025}
+            const bibtex = `@misc{liu2025unifiedembodiedvlmreasoning,
+      title={Unified Embodied VLM Reasoning with Robotic Action via Autoregressive Discretized Pre-training}, 
+      author={Yi Liu and Sukai Wang and Dafeng Wei and Xiaowei Cai and Linqing Zhong and Jiange Yang and Guanghui Ren and Jinyu Zhang and Maoqing Yao and Chuankang Li and Xindong He and Liliang Chen and Jianlan Luo},
+      year={2025},
+      eprint={2512.24125},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2512.24125}, 
 }`;
 
             const handleCopy = () => {
@@ -598,7 +601,7 @@
                         </div>
 
                         <div className="flex justify-center gap-4 flex-wrap mt-8">
-                            <Button href="./genie-reasoner-1230.pdf" label="Paper" icon={<FileText size={18} />} iconColor="text-red-600" />
+                            <Button href="https://arxiv.org/abs/2512.24125" label="Paper" icon={<FileText size={18} />} iconColor="text-red-600" />
                             <Button 
                                 href="https://github.com/GenieReasoner/ERIQ" 
                                 label="Benchmark" 
